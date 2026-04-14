@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<!--
+  Kotlin UIAutomator2 order-flow suite for DG Android app on LambdaTest.
+
+  Usage:
+    export LT_USERNAME=your_username
+    export LT_ACCESS_KEY=your_access_key
+    mvn test -Dsuite=dg-android-kotlin.xml
+-->
+<suite name="DG Android Order Flow (Kotlin)" verbose="1" parallel="tests" thread-count="2">
+
+    <test name="Galaxy S25 - Android 15">
+        <parameter name="appUrl"  value="lt://APP1016025301776080228086620"/>
+        <parameter name="device"  value="Galaxy S2[0-9]"/>
+        <parameter name="version" value="15"/>
+        <classes>
+            <class name="com.lambdatest.dg.kotlin.tests.DGOrderFlowTest">
+                <methods>
+                    <include name="loginToDGApp"/>
+                    <include name="addProductToCart"/>
+                    <include name="placeOrder"/>
+                    <include name="fullOrderFlowE2E"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="Pixel - Android 15">
+        <parameter name="appUrl"  value="lt://APP1016025301776080228086620"/>
+        <parameter name="device"  value="Pixel.*"/>
+        <parameter name="version" value="15"/>
+        <classes>
+            <class name="com.lambdatest.dg.kotlin.tests.DGOrderFlowTest">
+                <methods>
+                    <include name="loginToDGApp"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>
