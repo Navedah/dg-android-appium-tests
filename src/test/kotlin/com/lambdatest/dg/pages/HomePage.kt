@@ -20,6 +20,14 @@ class HomePage(private val driver: AndroidDriver) {
         private val CART_BADGE     = By.id("com.dollargeneral.qa2.android:id/tv_cart_count")
     }
 
+    /** Dismiss the promo/SDD overlay if present. */
+    fun dismissPromoIfPresent() {
+        val btns = driver.findElements(BTN_DISMISS)
+        if (btns.isNotEmpty()) {
+            try { btns[0].click(); println("Dismissed promo screen.") } catch (ignored: Exception) {}
+        }
+    }
+
     /** Click element immediately using findElements (avoids implicit wait delay). */
     private fun clickIfPresent(by: By, label: String): Boolean {
         val els = driver.findElements(by)
