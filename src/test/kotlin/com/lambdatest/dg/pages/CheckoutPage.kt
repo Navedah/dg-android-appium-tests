@@ -94,89 +94,37 @@ class CheckoutPage(private val driver: AndroidDriver) {
 
     /** Tap Save on the Checkout contact section to unlock Place order. */
     fun tapSaveContact() {
-        Thread.sleep(3000)
-
-        // Dump page source to identify the actual Save button resource-id
-        val src = driver.pageSource
-        println("── tapSaveContact page source ──")
-        src.split("\n").forEach { line ->
-            if (line.contains("resource-id") && !line.contains("resource-id=\"\"")) {
-                val id = line.replace(Regex(".*resource-id=\"([^\"]+)\".*"), "$1").trim()
-                if (id != line.trim()) println("  $id")
-            }
+        Thread.sleep(2000)
+        val saveBtns = driver.findElements(SAVE_BTN)
+        if (saveBtns.isNotEmpty()) {
+            try { saveBtns[0].click(); println("Tapped Save (contact section).") }
+            catch (ignored: Exception) {}
+        } else {
+            println("Save button not present — contact already saved.")
         }
-        println("────────────────────────────────")
-
-        var saved = false
-        try {
-            WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(SAVE_BTN)).click()
-            println("Tapped Save (contact section).")
-            saved = true
-        } catch (ignored: Exception) {}
-
-        if (!saved) {
-            try {
-                WebDriverWait(driver, Duration.ofSeconds(10))
-                    .until(ExpectedConditions.visibilityOfElementLocated(SAVE_BTN)).click()
-                println("Tapped Save (visibility fallback).")
-                saved = true
-            } catch (ignored: Exception) {}
-        }
-
-        if (!saved) println("Save button not found — contact section may already be saved.")
-        Thread.sleep(3000)
+        Thread.sleep(2000)
     }
 
     /**
      * Tap "Place order" on the order review screen.
-     * Confirmed: place_order is disabled until Save (contact section) is tapped.
+     * Skip delivery instructions if present, then tap Place order.
      */
     fun tapPlaceOrder() {
-        // Dump page source — show place_order enabled/clickable attributes
-        val src = driver.pageSource
-        println("── tapPlaceOrder page source ──")
-        src.split("\n").forEach { line ->
-            if (line.contains("place_order")) {
-                println("  PLACE_ORDER: ${line.trim().take(200)}")
-            } else if (line.contains("resource-id") && !line.contains("resource-id=\"\"")) {
-                val id = line.replace(Regex(".*resource-id=\"([^\"]+)\".*"), "$1").trim()
-                if (id != line.trim()) println("  $id")
-            }
-        }
-        println("────────────────────────────────")
-
-        // Tap Skip (delivery instructions) to dismiss that section
-        var skipped = false
+        // Tap Skip (delivery instructions) if visible
         try {
             val skipBtn = By.id("com.dollargeneral.qa2.android:id/skip_button")
-            WebDriverWait(driver, Duration.ofSeconds(8))
+            WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.elementToBeClickable(skipBtn)).click()
             println("Tapped Skip (delivery instructions).")
-            skipped = true
-            Thread.sleep(5000)
+            Thread.sleep(2000)
         } catch (ignored: Exception) {}
 
-        // If skip was tapped, dump page source to verify place_order state
-        if (skipped) {
-            val postSkipSrc = driver.pageSource
-            println("── post-Skip page source ──")
-            postSkipSrc.split("\n").forEach { line ->
-                if (line.contains("resource-id") && !line.contains("resource-id=\"\"")) {
-                    val id = line.replace(Regex(".*resource-id=\"([^\"]+)\".*"), "$1").trim()
-                    if (id != line.trim()) println("  $id")
-                }
-            }
-            println("────────────────────────────")
-        }
-
-        // Wait for place_order to be clickable (enabled after Skip/Save)
+        // Tap Place order — try clickable first, fall back to direct tap
         try {
             WebDriverWait(driver, Duration.ofSeconds(30))
                 .until(ExpectedConditions.elementToBeClickable(PLACE_ORDER_BTN)).click()
             println("Tapped Place order (clickable).")
         } catch (e: Exception) {
-            println("place_order not clickable, trying direct tap: ${e.message}")
             val btn = WebDriverWait(driver, Duration.ofSeconds(10))
                 .until(ExpectedConditions.presenceOfElementLocated(PLACE_ORDER_BTN))
             btn.click()

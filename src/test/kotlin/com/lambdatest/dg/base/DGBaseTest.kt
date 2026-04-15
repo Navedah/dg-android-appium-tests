@@ -58,20 +58,8 @@ open class DGBaseTest {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30))
 
         // Wait for app to finish loading (splash screen / network init)
-        Thread.sleep(60000)
+        Thread.sleep(45000)
         println("App ready — initial sleep complete.")
-        // Dump initial page source for debugging what screen the app opened to
-        try {
-            val initSrc = driver.pageSource
-            println("── Initial page source (after startup sleep) ──")
-            initSrc.split("\n").forEach { line ->
-                if (line.contains("resource-id") && !line.contains("resource-id=\"\"")) {
-                    val id = line.replace(Regex(".*resource-id=\"([^\"]+)\".*"), "$1").trim()
-                    if (id != line.trim()) println("  $id")
-                }
-            }
-            println("────────────────────────────────────────────────")
-        } catch (ignored: Exception) {}
     }
 
     @AfterMethod(alwaysRun = true)

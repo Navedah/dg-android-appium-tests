@@ -38,8 +38,8 @@ class HomePage(private val driver: AndroidDriver) {
     }
 
     fun verifyLoaded() {
-        for (attempt in 0 until 10) {
-            Thread.sleep(2000)
+        for (attempt in 0 until 6) {
+            Thread.sleep(1500)
             val src = driver.pageSource
 
             if (src.contains("id/home_search_view")) {
@@ -47,14 +47,17 @@ class HomePage(private val driver: AndroidDriver) {
                 return
             }
 
-            println("── verifyLoaded attempt $attempt ──")
-            src.split("\n").forEach { line ->
-                if (line.contains("resource-id") && !line.contains("resource-id=\"\"")) {
-                    val id = line.replace(Regex(".*resource-id=\"([^\"]+)\".*"), "$1").trim()
-                    if (id != line.trim()) println("  $id")
+            // Only dump on first attempt to reduce log noise and pageSource calls
+            if (attempt == 0) {
+                println("── verifyLoaded attempt $attempt ──")
+                src.split("\n").forEach { line ->
+                    if (line.contains("resource-id") && !line.contains("resource-id=\"\"")) {
+                        val id = line.replace(Regex(".*resource-id=\"([^\"]+)\".*"), "$1").trim()
+                        if (id != line.trim()) println("  $id")
+                    }
                 }
+                println("────────────────────────────────────")
             }
-            println("────────────────────────────────────")
 
             // Email verification — tap "Remind me later"
             if (src.contains("id/remind_me_later_tv")) {
